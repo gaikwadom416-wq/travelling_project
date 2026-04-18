@@ -1,0 +1,21 @@
+{
+    "roshan": {
+        "password": "1234",
+        "is_admin": false,
+        "name": "Roshan",
+        "email": "",
+        "mobile": "",
+        "address": "",
+        "photo_url": null,
+        "photo_path": "/static/uploads/roshan_WhatsApp_Image_2025-10-29_at_6.29.27_PM.jpeg"
+    },
+    "roshan23": {
+        "password": "1234",
+        "name": "Roshan",
+        "email": "roshansg2005@gmail.com",
+        "mobile": "9325637446",
+        "address": "sangamner",
+        "photo_path": "/static/uploads/roshan23_WhatsApp_Image_2025-10-29_at_6.29.27_PM.jpeg",
+        "is_admin": false
+    }
+}
