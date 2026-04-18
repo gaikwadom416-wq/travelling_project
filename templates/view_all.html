@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Bookings - Auto Booking</title>
+    <!-- Load Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <!-- Load Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <style>
+        /* --- General Theme Styles (Consistent) --- */
+        body {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align content to the top */
+            padding: 40px 0;
+            color: #ecf0f1;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .custom-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            padding: 40px;
+            border-radius: 12px;
+            max-width: 800px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        h1 {
+            border-bottom: 2px solid #2ecc71;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+            color: #ffffff;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            font-size: 2.2em;
+        }
+
+        /* --- Booking Card Styling --- */
+        .booking-card {
+            background: rgba(0, 0, 0, 0.4);
+            border-left: 5px solid #2ecc71;
+            transition: transform 0.2s;
+            margin-bottom: 20px;
+        }
+
+        .booking-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+        }
+
+        .location-icon {
+            color: #3498db;
+            width: 20px;
+            text-align: center;
+        }
+
+        .details-link {
+            color: #f1c40f;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .details-link:hover {
+            color: #e67e22;
+        }
+        
+        /* Status Badges */
+        .badge-pending { background-color: #f39c12; }
+        .badge-paid { background-color: #2ecc71; }
+        .badge-cancelled { background-color: #e74c3c; }
+        
+        /* --- Custom Back Button Style (Amethyst Purple) --- */
+        .btn-back-custom {
+            background-color: #8e44ad !important; /* Amethyst purple */
+            border: none;
+            color: white !important;
+            box-shadow: 0 4px 0 #7c3a96;
+            transition: all 0.2s ease;
+        }
+
+        .btn-back-custom:hover {
+            background-color: #7c3a96 !important;
+            box-shadow: 0 2px 0 #7c3a96;
+            transform: translateY(1px);
+            color: white !important;
+        }
+    </style>
+</head>
+<body>
+<div class="custom-container">
+    <h1><i class="fas fa-list-alt"></i> My Travel Bookings</h1>
+    
+    {% if bookings %}
+        <div class="list-group">
+            {% for booking in bookings %}
+            <div class="booking-card card p-3">
+                <div class="d-flex justify-content-between align-items-start">
+                    
+                    <!-- Trip Details -->
+                    <div>
+                        <h5 class="mb-1 text-light">
+                            <span class="location-icon me-2"><i class="fas fa-map-marker-alt"></i></span>
+                            {{ booking.pickup }} to {{ booking.drop_off }} 
+                        </h5>
+                        <p class="mb-2 text-light small">Booking ID: {{ booking.id }}</p>
+                        
+                        <p class="mb-1 text-light">
+                            <span class="location-icon me-2"><i class="fas fa-car"></i></span>
+                            Vehicle: <strong>{{ booking.vehicle }}</strong> ({{ booking.seats }} seats)
+                        </p>
+                        <p class="mb-1 text-light">
+                            <span class="location-icon me-2"><i class="far fa-calendar-alt"></i></span>
+                            Date: {{ booking.date }}
+                        </p>
+                    </div>
+
+                    <!-- Status and Fare -->
+                    <div class="text-end">
+                        <span class="badge rounded-pill 
+                            {% if booking.payment_method == 'Pending' %} badge-pending
+                            {% elif booking.payment_method == 'Paid' %} badge-paid
+                            {% else %} badge-cancelled
+                            {% endif %}
+                            mb-2">
+                            {{ booking.payment_method }}
+                        </span>
+                        
+                        <h4 class="text-success mb-1">
+                            <i class="fas fa-rupee-sign"></i> {{ booking.total_fare | round(2) }}
+                        </h4>
+                        <p class="text-light small">{{ booking.distance | round(1) }} km</p>
+                        
+                        <a href="{{ url_for('view_ticket', booking_id=booking.id) }}" class="details-link">
+                            View Details <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info text-center mt-4" role="alert">
+            <i class="fas fa-info-circle"></i> You have no active bookings. Start your journey now!
+        </div>
+    {% endif %}
+
+    <div class="text-center mt-4">
+        <a href="{{ url_for('home') }}" class="btn btn-primary btn-back-custom">
+            <i class="fas fa-arrow-left"></i> Back to Home
+        </a>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+</body>
+</html>

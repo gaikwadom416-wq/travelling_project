@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Auto Booking System - Home</title>
+    <style>
+        /* --- General Reset & Body Styling --- */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            /* Modern Gradient Background */
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #ecf0f1;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* --- Main Container --- */
+        .container {
+            background: rgba(255, 255, 255, 0.1); /* Slightly transparent white background */
+            backdrop-filter: blur(5px); /* Adds a cool blur effect */
+            padding: 40px;
+            border-radius: 12px;
+            max-width: 800px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); /* Stronger shadow for depth */
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            color: #ffffff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        p {
+            font-size: 1.1em;
+            opacity: 0.9;
+            margin-bottom: 25px;
+        }
+
+        /* --- Buttons and Links --- */
+        button, a > button {
+            padding: 12px 25px;
+            margin: 8px;
+            cursor: pointer;
+            border-radius: 8px;
+            border: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: white; /* Default button text color */
+        }
+        
+        /* Primary (Booking) Buttons */
+        .booking-buttons button {
+            background-color: #2ecc71; /* Emerald Green */
+            box-shadow: 0 4px 0 #27ae60;
+        }
+
+        .booking-buttons button:hover {
+            background-color: #27ae60;
+            transform: translateY(-2px);
+        }
+
+        /* Login Button */
+        .login-btn {
+            background-color: #3498db; /* Peter River Blue */
+            box-shadow: 0 4px 0 #2980b9;
+        }
+        .login-btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        /* Register/Change Password/Profile Buttons */
+        .account-btn {
+            background-color: #9b59b6; /* Amethyst */
+            box-shadow: 0 4px 0 #8e44ad;
+        }
+        .account-btn:hover {
+            background-color: #8e44ad;
+            transform: translateY(-2px);
+        }
+
+        /* Logout Button */
+        .logout-btn {
+            background-color: #e74c3c; /* Alizarin Red */
+            box-shadow: 0 4px 0 #c0392b;
+        }
+        .logout-btn:hover {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        /* --- Section Separator --- */
+        hr {
+            border: 0;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.2);
+            margin: 30px 0;
+        }
+
+        /* --- Flash Messages --- */
+        .flash {
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            font-weight: bold;
+            color: #34495e; /* Dark text for readability */
+            text-align: left;
+            border: 1px solid transparent;
+        }
+        .flash.success { background-color: #d4edda; border-color: #c3e6cb; }
+        .flash.error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .flash.warning { background-color: #fff3cd; border-color: #ffeeba; }
+        .flash.info { background-color: #d1ecf1; border-color: #bee5eb; }
+
+        /* --- Footer Links --- */
+        .footer-links a {
+            color: #ecf0f1;
+            margin: 0 10px;
+            text-decoration: none;
+            border-bottom: 2px solid transparent;
+            padding-bottom: 3px;
+            transition: border-bottom 0.2s ease;
+        }
+        .footer-links a:hover {
+            border-bottom: 2px solid #3498db;
+        }
+        
+        /* Flex containers for button groups */
+        .auth-buttons, .booking-buttons, .footer-links {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap; /* Allows buttons to wrap on smaller screens */
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Auto Booking System</h1>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    {% if logged_in %}
+        <p>Welcome, **{{ username }}**! Choose a vehicle to start booking.</p>
+        <div class="auth-buttons">
+            <a href="{{ url_for('profile') }}"><button class="account-btn">View Profile</button></a>
+            <!-- NEW: Added Book Auto button -->
+            <a href="{{ url_for('logout') }}"><button class="logout-btn">Logout</button></a>
+            <!-- REMOVED: Change Password button was here -->
+        </div>
+        
+        <hr>
+        
+        <div class="booking-buttons">
+            <a href="/book?vehicle=Auto"><button>Book Auto</button></a>
+            <a href="/book?vehicle=Car"><button>Book Car</button></a>
+            <a href="/book?vehicle=Bus"><button>Book Bus</button></a>
+            <a href="/book?vehicle=Taxi"><button>Book Taxi</button></a>
+        </div>
+        
+        <hr>
+        
+        <div class="footer-links">
+            <a href="/view_all">View My Bookings</a> 
+            <a href="/cancel_booking">Cancel Booking</a>
+        </div>
+        
+    {% else %}
+        <p>Please log in or create an account to start booking and view your dashboard.</p>
+        <div class="auth-buttons">
+            <a href="{{ url_for('login') }}"><button class="login-btn">Log In</button></a>
+            <a href="{{ url_for('register') }}"><button class="account-btn">Create Account</button></a>
+        </div>
+    {% endif %}
+</div>
+</body>
+</html>

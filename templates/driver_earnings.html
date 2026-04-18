@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Earnings & Collection - Driver</title>
+    <!-- Load Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <!-- Load Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <style>
+        /* --- General Theme Styles (Consistent with Dashboard) --- */
+        body {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px 0;
+            color: #ecf0f1;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            padding: 40px;
+            border-radius: 12px;
+            max-width: 800px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        h2 {
+            border-bottom: 2px solid #f39c12; /* Yellow/Accent border */
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+            color: #ffffff;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            font-size: 2em;
+            text-align: center;
+        }
+        
+        /* --- Total Earnings Card Styling --- */
+        .earnings-summary-card {
+            background-color: #2c3e50;
+            border-left: 5px solid #f39c12; /* Yellow Accent */
+            padding: 25px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .earnings-summary-card h4 {
+            color: #f39c12;
+            font-size: 1.2em;
+            margin-bottom: 5px;
+        }
+
+        .earnings-summary-card .total-amount {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: #2ecc71; /* Green success color */
+        }
+
+        /* --- Individual Trip Card Styling --- */
+        .trip-collection-card {
+            background-color: #34495e;
+            border-left: 3px solid #2ecc71;
+            margin-bottom: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            transition: transform 0.2s;
+        }
+
+        .trip-collection-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(46, 204, 113, 0.2);
+        }
+
+        .trip-detail-label {
+            font-weight: 500;
+            color: #bdc3c7;
+            font-size: 0.9em;
+            display: block;
+        }
+        
+        .trip-fare-amount {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #2ecc71;
+        }
+        
+        /* --- Back Button Style --- */
+        .btn-back-custom {
+            background-color: #8e44ad !important;
+            border: none;
+            color: white !important;
+            box-shadow: 0 4px 0 #7c3a96;
+            transition: all 0.2s ease;
+        }
+
+        .btn-back-custom:hover {
+            background-color: #7c3a96 !important;
+            box-shadow: 0 2px 0 #7c3a96;
+            transform: translateY(1px);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container py-4">
+    <a href="{{ url_for('driver_dashboard') }}" class="btn btn-primary btn-back-custom mb-4">
+        <i class="fas fa-arrow-left"></i> Back to Driver Dashboard
+    </a>
+
+    <h2 class="text-warning mb-4">
+        <i class="fas fa-coins"></i> Earnings & Collection
+    </h2>
+
+    <!-- Total Earnings Summary -->
+    <div class="earnings-summary-card">
+        <h4>Total Lifetime Earnings</h4>
+        <div class="total-amount">₹{{ total_earnings | default(0) | round(2) }}</div>
+    </div>
+
+    <h4 class="text-light mb-3">Trip History for Collection</h4>
+
+    {% if bookings %}
+        {% for b in bookings %}
+            <div class="trip-collection-card card shadow-sm">
+                <div class="card-body p-3 row align-items-center">
+                    
+                    <div class="col-md-5 col-sm-12 mb-2 mb-md-0">
+                        <span class="trip-detail-label"><i class="fas fa-receipt"></i> Booking ID:</span>
+                        <strong>{{ b.id }}</strong>
+                    </div>
+                    
+                    <div class="col-md-3 col-6 text-md-start text-start">
+                        <span class="trip-detail-label"><i class="fas fa-calendar-alt"></i> Date:</span>
+                        {{ b.date }}
+                    </div>
+                    
+                    <div class="col-md-4 col-6 text-md-end text-end">
+                        <span class="trip-detail-label">Fare Collected:</span>
+                        <span class="trip-fare-amount">₹{{ b.total_fare | round(2) }}</span>
+                    </div>
+
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="alert alert-info text-center">
+            <i class="fas fa-info-circle"></i> No earnings yet.
+        </div>
+    {% endif %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/js/all.min.js"></script>
+</body>
+</html>

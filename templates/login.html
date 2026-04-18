@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+<head><title>User Login</title>
+    <style>
+        /* --- General Reset & Body Styling (Consistent with Home) --- */
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); 
+            color: #ecf0f1; 
+            min-height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+        }
+        
+        /* --- Main Container (Semi-transparent, blurred) --- */
+        .container { 
+            background: rgba(255, 255, 255, 0.1); 
+            backdrop-filter: blur(5px); 
+            padding: 40px; 
+            border-radius: 12px; 
+            max-width: 400px; 
+            width: 90%; 
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); 
+            text-align: left; 
+        }
+
+        /* --- Header Navigation Style --- */
+        .header-nav {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .header-nav a {
+            padding: 8px 15px;
+            font-weight: bold;
+            text-decoration: none;
+            color: #3498db; 
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+        .header-nav a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+        }
+        .header-nav .active {
+            background-color: #3498db;
+            color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+        }
+        
+        h1 { 
+            text-align: center; 
+            color: #ffffff; 
+            margin-bottom: 25px;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+        }
+        
+        label { 
+            display: block; 
+            margin-top: 15px; 
+            margin-bottom: 5px; 
+            font-weight: bold; 
+        }
+        
+        /* --- Input Fields --- */
+        input[type="text"], input[type="password"], input[type="email"] { 
+            width: 100%; 
+            padding: 12px; 
+            margin-bottom: 10px; 
+            border-radius: 6px; 
+            border: 1px solid #5a74a1; 
+            box-sizing: border-box; 
+            background-color: rgba(255, 255, 255, 0.95); 
+            color: #34495e; 
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.8);
+        }
+        
+        /* --- Buttons --- */
+        .login-button { 
+            background-color: #3498db; 
+            box-shadow: 0 4px 0 #2980b9; 
+            color: white; 
+            padding: 12px 20px; 
+            margin-top: 25px; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            width: 100%; 
+            font-weight: bold; 
+            transition: all 0.2s ease; 
+        }
+        
+        .login-button:hover { 
+            background-color: #2980b9; 
+            transform: translateY(1px);
+            box-shadow: 0 3px 0 #2980b9;
+        }
+
+        /* --- Forgot Password Link --- */
+        .forgot-password {
+            text-align: right;
+            margin-top: 10px;
+        }
+        .forgot-password a {
+            color: #3498db;
+            text-decoration: none;
+            font-size: 0.9em;
+        }
+        .forgot-password a:hover {
+            color: #ffffff;
+            text-decoration: underline;
+        }
+        
+        p { 
+            text-align: center; 
+            margin-top: 20px; 
+            font-size: 0.9em;
+        }
+        
+        a { 
+            color: #3498db; 
+            text-decoration: none; 
+            transition: color 0.2s ease;
+        }
+        a:hover {
+            color: #ffffff;
+            text-decoration: underline;
+        }
+
+        /* --- Flash Messages --- */
+        .flash { 
+            padding: 15px; 
+            margin: 15px 0; 
+            border-radius: 8px; 
+            font-weight: bold; 
+            color: #34495e; 
+            text-align: left; 
+            border: 1px solid transparent; 
+        }
+        .flash.success { background-color: #d4edda; border-color: #c3e6cb; }
+        .flash.error { background-color: #f8d7da; border-color: #f5c6cb; }
+
+        /* --- Forgot Password Block Styling --- */
+        #forgot-block {
+            display: none; 
+            margin-top: 20px;
+            padding-top: 20px;
+        }
+        
+        .recovery-button {
+            background-color: #e67e22; 
+            box-shadow: 0 4px 0 #d35400; 
+            width: 100%;
+            margin-top: 15px;
+        }
+        .recovery-button:hover {
+            background-color: #d35400;
+            box-shadow: 0 3px 0 #d35400;
+        }
+        
+        .back-to-login {
+            color: #3498db;
+            cursor: pointer;
+            margin-top: 15px;
+            display: block;
+            text-align: center;
+            font-size: 0.9em;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    <div class="header-nav">
+        <a href="{{ url_for('home') }}">Home</a>
+        <a href="{{ url_for('login') }}" class="active">Login</a>
+        <a href="{{ url_for('register') }}">Create Account</a>
+    </div>
+
+    <h1>User Login</h1>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Main Login Form Content Container -->
+    <div id="login-main-content">
+        <form method="POST" action="{{ url_for('login') }}" id="login-form">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+            
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+            
+            <!-- FORGOT PASSWORD LINK -->
+            <div class="forgot-password">
+                <a href="#" onclick="toggleContainers(event, 'forgot')">Forgot Password?</a>
+            </div>
+            
+            <button type="submit" class="login-button">Log In</button>
+        </form>
+        
+        <p>Don't have an account? <a href="{{ url_for('register') }}">Create one</a></p>
+    </div>
+    
+    <!-- FORGOT PASSWORD BLOCK -->
+    <div id="forgot-block">
+        <h2>Password Recovery</h2>
+        <p style="text-align: left; font-size: 0.9em;">Enter your registered email address below to receive a password reset link.</p>
+        
+        <!-- CRITICAL FIX: Ensure this form submits to the correct route! -->
+        <form action="{{ url_for('forgot_password') }}" method="POST" id="recovery-form"> 
+            <label for="recovery_email">Email Address:</label>
+            <input type="email" id="recovery_email" name="recovery_email" required>
+            <button type="submit" class="recovery-button">Send Reset Link</button>
+        </form>
+        
+        <a href="#" class="back-to-login" onclick="toggleContainers(event, 'login')">← Back to Login</a>
+
+    </div>
+    <!-- END FORGOT PASSWORD BLOCK -->
+    
+</div>
+
+<script>
+    function toggleContainers(event, target) {
+        event.preventDefault(); 
+        
+        const loginContent = document.getElementById('login-main-content');
+        const forgotBlock = document.getElementById('forgot-block');
+
+        if (target === 'forgot') {
+            loginContent.style.display = 'none';
+            forgotBlock.style.display = 'block';
+        } else if (target === 'login') {
+            loginContent.style.display = 'block';
+            forgotBlock.style.display = 'none';
+        }
+    }
+</script>
+
+</body>
+</html>

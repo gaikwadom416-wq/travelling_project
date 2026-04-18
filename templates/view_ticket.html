@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket - {{ booking.id }}</title>
+    <!-- Load Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <!-- Load Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <style>
+        /* --- General Theme Styles (Consistent) --- */
+        body {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #ecf0f1;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .custom-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            padding: 40px;
+            border-radius: 12px;
+            max-width: 700px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        h1 {
+            border-bottom: 2px solid #2ecc71;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+            color: #ffffff;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            font-size: 2.2em;
+        }
+        
+        /* --- Ticket Details Card --- */
+        .ticket-card {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+        }
+
+        .detail-row {
+            padding: 10px 0;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .detail-row:last-child { border-bottom: none; }
+        
+        .label-text {
+            font-weight: 500;
+            color: #bdc3c7;
+        }
+        .value-text {
+            font-weight: bold;
+            color: #ffffff;
+        }
+        
+        /* Highlighting Fare */
+        .fare-text {
+            font-size: 1.5em;
+            color: #2ecc71; /* Green success color */
+        }
+
+        /* --- Gemini Feature Styles --- */
+        #advice-section {
+            margin-top: 35px;
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+        #advice-content {
+            white-space: pre-wrap;
+            padding: 15px;
+            border-radius: 6px;
+            min-height: 100px;
+            text-align: left;
+            margin-top: 15px;
+            font-size: 0.95em;
+            background: #1a2538; /* Darker background for text area */
+        }
+        #advice-content.loading {
+            text-align: center;
+            font-style: italic;
+            color: #bdc3c7;
+        }
+
+        .advice-button {
+            background-color: #f1c40f; /* Yellow */
+            color: #333;
+            font-weight: bold;
+            padding: 12px 20px;
+            box-shadow: 0 4px 0 #f39c12;
+            transition: all 0.2s ease;
+            border: none;
+            width: 100%;
+        }
+        .advice-button:hover {
+            background-color: #f39c12;
+            transform: translateY(1px);
+        }
+        
+        /* --- Back Button (Amethyst Purple - Consistent) --- */
+        .btn-back-custom {
+            background-color: #8e44ad !important;
+            border: none;
+            color: white !important;
+            box-shadow: 0 4px 0 #7c3a96;
+            transition: all 0.2s ease;
+        }
+
+        .btn-back-custom:hover {
+            background-color: #7c3a96 !important;
+            box-shadow: 0 2px 0 #7c3a96;
+            transform: translateY(1px);
+            color: white !important;
+        }
+    </style>
+</head>
+<body>
+<div class="custom-container">
+    <h1><i class="fas fa-ticket-alt"></i> Booking Confirmation</h1>
+    
+    <div class="ticket-card">
+        <h2 class="text-center mb-4 text-warning">Trip ID: {{ booking.id }}</h2>
+
+        <div class="detail-row">
+            <span class="label-text"><i class="fas fa-car me-2"></i> Vehicle</span>
+            <span class="value-text">{{ booking.vehicle }} ({{ booking.seats }} seats)</span>
+        </div>
+        
+        <div class="detail-row">
+            <span class="label-text"><i class="fas fa-map-marker-alt me-2"></i> Pickup Location</span>
+            <span class="value-text">{{ booking.pickup }}</span>
+        </div>
+        
+        <div class="detail-row">
+            <span class="label-text"><i class="fas fa-map-pin me-2"></i> Drop-off Location</span>
+            <span class="value-text">{{ booking.drop }}</span>
+        </div>
+
+        <div class="detail-row">
+            <span class="label-text"><i class="far fa-calendar-alt me-2"></i> Date</span>
+            <span class="value-text">{{ booking.date }}</span>
+        </div>
+
+        <div class="detail-row">
+            <span class="label-text"><i class="fas fa-road me-2"></i> Distance</span>
+            <span class="value-text">{{ booking.distance | round(1) }} km</span>
+        </div>
+        
+        <div class="detail-row bg-dark bg-opacity-25 rounded mt-3 p-2">
+            <span class="label-text fare-text"><i class="fas fa-rupee-sign me-2"></i> Total Fare</span>
+            <span class="value-text fare-text">{{ booking.total_fare | round(2) }}</span>
+        </div>
+        
+        <div class="detail-row">
+            <span class="label-text"><i class="fas fa-credit-card me-2"></i> Payment Status</span>
+            <span class="value-text text-info">{{ booking.payment_method }}</span>
+        </div>
+    </div>
+    
+    <!-- Gemini API Feature -->
+    <button class="btn advice-button" onclick="getTripAdvice('{{ booking.id }}')" id="advice-btn">
+        <i class="fas fa-route"></i> Generate Personalized Travel Guide
+    </button>
+    
+    <div id="advice-section">
+        <h2 class="text-warning fs-5 pt-3">AI Travel Guide</h2>
+        <div id="advice-content" class="loading">Click the button above to generate a guide based on your trip details.</div>
+        <div id="sources" style="font-size: 0.8em; margin-top: 10px; color: #95a5a6; text-align: left;"></div>
+    </div>
+
+    <div class="text-center mt-4">
+        <a href="{{ url_for('view_all') }}" class="btn btn-primary btn-back-custom">
+            <i class="fas fa-arrow-left"></i> Back to My Bookings
+        </a>
+    </div>
+
+</div>
+
+<script>
+    async function getTripAdvice(bookingId) {
+        const adviceContent = document.getElementById('advice-content');
+        const adviceBtn = document.getElementById('advice-btn');
+        const sourcesDiv = document.getElementById('sources');
+        
+        adviceContent.innerHTML = 'Generating personalized guide... This may take a moment.';
+        adviceContent.classList.add('loading');
+        adviceBtn.disabled = true;
+        sourcesDiv.innerHTML = '';
+        
+        try {
+            // Added exponential backoff handling to prevent throttling errors
+            let data;
+            for (let i = 0; i < 3; i++) {
+                const response = await fetch(`/generate_trip_advice/${bookingId}`);
+                if (response.status === 429 && i < 2) { // 429 Too Many Requests
+                    await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
+                    continue;
+                }
+                
+                data = await response.json();
+
+                if (response.status !== 200) {
+                    adviceContent.innerHTML = `Error: ${data.text || 'Failed to fetch guide.'}`;
+                } else {
+                    adviceContent.innerHTML = data.text;
+                    
+                    let sourceHtml = '';
+                    if (data.sources && data.sources.length > 0) {
+                        sourceHtml += 'Sources: ';
+                        data.sources.forEach((source, index) => {
+                            if (source.uri && source.title) {
+                                sourceHtml += `<a href="${source.uri}" target="_blank" style="color:#2ecc71; text-decoration: underline;">${source.title}</a>${index < data.sources.length - 1 ? ', ' : ''}`;
+                            }
+                        });
+                    }
+                    sourcesDiv.innerHTML = sourceHtml;
+                }
+                break; // Exit loop on success or non-retryable error
+            }
+
+        } catch (error) {
+            adviceContent.innerHTML = `An unexpected network error occurred: ${error.message}`;
+        } finally {
+            adviceContent.classList.remove('loading');
+            adviceBtn.disabled = false;
+        }
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+</body>
+</html>

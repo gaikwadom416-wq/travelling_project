@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Your Auto</title>
+    <!-- Load Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <!-- Load Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <style>
+        /* Replicating the custom dark gradient background */
+        body {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #ecf0f1;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Main Container styling using Bootstrap classes and custom shadow/blur */
+        .custom-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            padding: 40px;
+            border-radius: 12px;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        h1 {
+            border-bottom: 2px solid #2ecc71;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+            color: #ffffff;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            font-size: 2em;
+        }
+        
+        /* Making form controls match the dark theme */
+        .form-control, .form-control:focus {
+            background-color: rgba(255, 255, 255, 0.9);
+            color: #34495e;
+            border-color: #5a74a1;
+        }
+        
+        .form-control:focus {
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.8);
+            border-color: #3498db;
+        }
+
+        /* Styling for the Confirm Button (Green) */
+        .btn-confirm {
+            background-color: #2ecc71; 
+            box-shadow: 0 4px 0 #27ae60;
+            color: white;
+            padding: 15px 30px;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: all 0.2s ease;
+            border: none;
+        }
+
+        .btn-confirm:hover {
+            background-color: #27ae60;
+            transform: translateY(1px);
+            box-shadow: 0 3px 0 #27ae60;
+            color: white;
+        }
+
+        /* --- Back Button (Amethyst Purple - Consistent Style) --- */
+        .btn-back-custom {
+            background-color: #8e44ad !important;
+            border: none;
+            color: white !important;
+            box-shadow: 0 4px 0 #7c3a96;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-back-custom:hover {
+            background-color: #7c3a96 !important;
+            box-shadow: 0 2px 0 #7c3a96;
+            transform: translateY(1px);
+            color: white !important;
+        }
+
+    </style>
+</head>
+<body>
+<div class="custom-container">
+    <h1>Book Your Auto Trip</h1>
+    
+    <form method="POST">
+        
+        <!-- VEHICLE TYPE (Readonly) -->
+        <div class="mb-3">
+            <label class="form-label">Selected Vehicle</label>
+            <input type="text" name="vehicle" value="{{ vehicle_pref }}" class="form-control" readonly required>
+        </div>
+
+        <!-- PICKUP AND DROP-OFF LOCATION (Using Bootstrap Grid) -->
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Pickup Location</label>
+                <input type="text" name="pickup" placeholder="Enter full address or landmark" class="form-control" required>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Drop-off Location</label>
+                <input type="text" name="drop" placeholder="Enter destination address or landmark" class="form-control" required>
+            </div>
+        </div>
+
+        <!-- DATE AND TIME -->
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Date</label>
+                <input type="date" name="date" class="form-control" required>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Pickup Time</label>
+                <input type="time" name="pickup_time" value="10:00" class="form-control" required>
+            </div>
+        </div>
+
+        <!-- SEATS AND DISTANCE -->
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Seats Required</label>
+                <input type="number" name="seats" value="1" min="1" class="form-control" required>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Estimated Distance (km)</label>
+                <input type="number" step="0.1" name="distance" placeholder="E.g., 15.5" class="form-control" required>
+            </div>
+        </div>
+
+        <!-- SPECIAL NOTES -->
+        <div class="mb-3">
+            <label class="form-label">Special Requests / Notes</label>
+            <textarea name="notes" rows="3" placeholder="e.g., Need large trunk space, require child seat, etc." class="form-control"></textarea>
+        </div>
+        
+        <button type="submit" class="btn w-100 btn-confirm">Confirm Booking & Pay</button>
+    </form>
+    
+    <div class="text-center mt-4">
+        <!-- APPLYING THE CUSTOM BACK BUTTON STYLE -->
+        <a href="{{ url_for('home') }}" class="btn btn-primary btn-back-custom">
+            <i class="fas fa-arrow-left"></i> Back to Home Page
+        </a>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/js/all.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <style>
+        :root {
+            --sidebar-width: 250px;
+            --navbar-height: 60px;
+            --main-bg: linear-gradient(135deg, #0f172a 0%, #1f2937 100%);
+            --accent-color: #e67e22;
+            --primary-color: #3498db;
+            --dark-color: #111827;
+        }
+
+        body {
+            background: var(--main-bg);
+            min-height: 100vh;
+            color: #e5e7eb;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding-top: var(--navbar-height);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        #top-navbar {
+            height: var(--navbar-height);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--dark-color);
+            z-index: 1040;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.6);
+            padding: 0 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        #menu-toggle {
+            background: var(--accent-color);
+            border: none;
+            color: #1f2937;
+            font-size: 1.2em;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+            margin-right: 15px;
+        }
+
+        .dashboard-header {
+            font-size: 1.8em;
+            color: #fff;
+            margin: 0;
+            display: inline-block;
+        }
+
+        /* Sidebar */
+        #sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: var(--dark-color);
+            transition: transform 0.3s ease;
+            transform: translateX(calc(-1 * var(--sidebar-width)));
+            z-index: 1050;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.6);
+            padding-top: var(--navbar-height);
+        }
+
+        #sidebar.open {
+            transform: translateX(0);
+        }
+
+        #sidebar a {
+            padding: 15px 20px;
+            text-decoration: none;
+            font-size: 0.95em;
+            color: #e5e7eb;
+            display: block;
+            transition: background-color 0.2s;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+
+        #sidebar a:hover {
+            background-color: #1f2937;
+            color: var(--accent-color);
+        }
+
+        .sidebar-profile {
+            text-align: center;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-profile img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid var(--accent-color);
+            object-fit: cover;
+            margin-bottom: 10px;
+        }
+
+        #main-content {
+            padding: 30px;
+            transition: margin-left 0.3s ease;
+            margin-left: 0;
+        }
+
+        @media (min-width: 768px) {
+            #main-content.sidebar-open {
+                margin-left: var(--sidebar-width);
+            }
+        }
+
+        /* Cards */
+        .stat-card {
+            background: #1f2937;
+            border-left: 5px solid var(--primary-color);
+            color: #e5e7eb;
+        }
+
+        .stat-icon {
+            font-size: 2.2rem;
+            opacity: 0.8;
+        }
+
+        .table-wrapper {
+            background: #1f2937;
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .logout-btn {
+            background-color: #e74c3c;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<nav id="top-navbar">
+    <button id="menu-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
+    <h1 class="dashboard-header">
+        <i class="fas fa-user-shield"></i> Admin Dashboard
+    </h1>
+
+    <div class="ms-auto d-flex align-items-center gap-3">
+        <span class="small text-light d-none d-md-inline">
+            Logged in as: <strong>{{ admin_user.name }}</strong>
+        </span>
+        <a href="{{ url_for('logout') }}" class="btn logout-btn btn-sm">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+    </div>
+</nav>
+
+<nav id="sidebar">
+    <div class="sidebar-profile">
+        <img src="{{ admin_user.photo_path or '/static/download.jpeg' }}" alt="Admin Photo">
+        <h5 class="text-warning mb-0">{{ admin_user.name }}</h5>
+        <small class="text-muted">Administrator</small>
+    </div>
+
+    <a href="{{ url_for('admin_dashboard') }}"><i class="fas fa-chart-line"></i> Overview</a>
+    <a href="{{ url_for('view_all') }}"><i class="fas fa-ticket-alt"></i> All Bookings</a>
+    <a href="{{ url_for('home') }}"><i class="fas fa-home"></i> Passenger Home</a>
+    <a href="{{ url_for('profile') }}"><i class="fas fa-user-cog"></i> My Profile</a>
+</nav>
+
+<div id="main-content" class="container-fluid">
+    <!-- Top Welcome / Summary -->
+    <div class="card mb-4" style="background:#111827; border-left:5px solid var(--accent-color);">
+        <div class="card-body d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+            <div>
+                <h3 class="mb-1">Welcome, {{ admin_user.name }} 👋</h3>
+                <p class="mb-0 small text-muted">
+                    Here’s an overview of your platform activity and latest bookings.
+                </p>
+            </div>
+            <div class="mt-3 mt-md-0">
+                <span class="badge bg-warning text-dark">
+                    Total Bookings: {{ stats.total_bookings }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3 col-6">
+            <div class="card stat-card p-3">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <p class="mb-1 text-muted small">Total Users</p>
+                        <h4 class="mb-0">{{ stats.total_users }}</h4>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-6">
+            <div class="card stat-card p-3">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <p class="mb-1 text-muted small">Drivers</p>
+                        <h4 class="mb-0">{{ stats.total_drivers }}</h4>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-id-card"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-6">
+            <div class="card stat-card p-3">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <p class="mb-1 text-muted small">Passengers</p>
+                        <h4 class="mb-0">{{ stats.total_passengers }}</h4>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-user-friends"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-6">
+            <div class="card stat-card p-3">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <p class="mb-1 text-muted small">Bookings</p>
+                        <h4 class="mb-0">{{ stats.total_bookings }}</h4>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-taxi"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Bookings Table -->
+    <div class="table-wrapper">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0"><i class="fas fa-list"></i> Recent Bookings</h5>
+            <span class="badge bg-primary">Latest 10</span>
+        </div>
+
+        {% if recent_bookings %}
+            <div class="table-responsive">
+                <table class="table table-sm table-dark table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Booking ID</th>
+                            <th>Passenger</th>
+                            <th>Vehicle</th>
+                            <th>Route</th>
+                            <th>Fare</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in recent_bookings %}
+                            <tr>
+                                <td>{{ item.booking.id }}</td>
+                                <td>
+                                    {{ item.passenger_name }}<br>
+                                    <small class="text-muted">{{ item.passenger_email }}</small>
+                                </td>
+                                <td>{{ item.booking.vehicle }}</td>
+                                <td>
+                                    <small>{{ item.booking.pickup }} → {{ item.booking.drop_off }}</small>
+                                </td>
+                                <td>₹ {{ item.booking.total_fare | round(2) }}</td>
+                                <td>
+                                    <small>{{ item.booking.created_at.strftime("%Y-%m-%d %H:%M") }}</small>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info mb-0">
+                No bookings found yet.
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+
+        sidebar.classList.toggle('open');
+        mainContent.classList.toggle('sidebar-open');
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+</body>
+</html>

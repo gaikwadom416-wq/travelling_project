@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver Dashboard</title>
+    <!-- Load Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <!-- Load Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <style>
+        :root {
+            --sidebar-width: 250px;
+            --navbar-height: 60px;
+            --main-bg: linear-gradient(135deg, #1a2538 0%, #34495e 100%);
+            --accent-color: #f39c12;
+            --primary-color: #2ecc71;
+            --dark-color: #1a2538;
+        }
+
+        body {
+            background: var(--main-bg); 
+            min-height: 100vh;
+            color: #ecf0f1;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding-top: var(--navbar-height); 
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* --- Fixed Top Navbar (Header) --- */
+        #top-navbar {
+            height: var(--navbar-height);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--dark-color);
+            z-index: 1040; 
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            padding: 0 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* --- Sidebar Styling --- */
+        #sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: var(--dark-color);
+            transition: transform 0.3s ease;
+            transform: translateX(calc(-1 * var(--sidebar-width))); 
+            z-index: 1050;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+            padding-top: var(--navbar-height); 
+        }
+
+        #sidebar.open {
+            transform: translateX(0); 
+        }
+
+        #sidebar a {
+            padding: 15px 20px;
+            text-decoration: none;
+            font-size: 1em;
+            color: #ecf0f1;
+            display: block;
+            transition: background-color 0.2s;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        #sidebar a:hover {
+            background-color: #34495e;
+            color: var(--accent-color);
+        }
+
+        .sidebar-profile {
+            text-align: center;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-profile img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid var(--accent-color);
+            object-fit: cover;
+            margin-bottom: 10px;
+        }
+
+        /* --- Main Content Area --- */
+        #main-content {
+            padding: 30px 30px 30px 30px; 
+            transition: margin-left 0.3s ease;
+            margin-left: 0; 
+        }
+
+        /* --- Toggle Button --- */
+        #menu-toggle {
+            background: var(--accent-color);
+            border: none;
+            color: var(--dark-color);
+            font-size: 1.2em;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+            margin-right: 15px; 
+        }
+        
+        .dashboard-header {
+            font-size: 1.8em;
+            color: #ffffff;
+            margin: 0;
+            display: inline-block;
+        }
+        
+        .welcome-card {
+            background: #2c3e50;
+            border-left: 5px solid var(--accent-color);
+            padding: 20px;
+            margin-bottom: 30px;
+            color: #ecf0f1;
+        }
+
+        /* --- Job Card Styling (Unchanged) --- */
+        .job-card {
+            background: #34495e; 
+            border-left: 5px solid var(--primary-color); 
+            margin-bottom: 20px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .job-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.2);
+        }
+        
+        .job-card-header {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px 15px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .location-text {
+            font-size: 1.1em;
+            font-weight: 500;
+        }
+
+        .accept-btn {
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 3px 0 #27ae60;
+            transition: all 0.2s;
+        }
+        .accept-btn:hover {
+            background-color: #27ae60;
+            transform: translateY(1px);
+        }
+
+        .logout-btn {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .info-label {
+            color: #bdc3c7;
+            font-size: 0.9em;
+            margin-bottom: 0;
+        }
+        
+        /* --- RESPONSIVE ADJUSTMENTS --- */
+        @media (min-width: 768px) {
+            #main-content.sidebar-open {
+                margin-left: var(--sidebar-width);
+            }
+        }
+        @media (max-width: 767px) {
+            .sidebar-profile h4 { display: none; }
+            .sidebar-profile small { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Fixed Top Navbar -->
+<nav id="top-navbar">
+    <button id="menu-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
+    <h1 class="dashboard-header"><i class="fas fa-steering-wheel"></i> Driver Dashboard</h1>
+    
+    <div class="ms-auto">
+        <a href="{{ url_for('logout') }}" class="btn logout-btn">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+    </div>
+</nav>
+
+<!-- Sliding Sidebar Menu -->
+<nav id="sidebar">
+    <div class="sidebar-profile">
+        <!-- CRITICALLY UPDATED: Uses the path passed from the backend -->
+        <img src="{{ driver_user.photo_path }}" alt="Profile Photo" id="sidebar-photo">
+        <h4 class="text-warning mb-0">Hello, {{ driver_user.name }}</h4>
+        <small class="text-muted">Driver Access</small>
+    </div>
+    
+    <a href="{{ url_for('driver_dashboard') }}" class="active"><i class="fas fa-route"></i> View New Trips</a>
+<a href="{{ url_for('driver_assigned') }}"><i class="fas fa-car"></i> View My Assigned Bookings</a>
+   <a href="{{ url_for('driver_trip_history') }}"><i class="fas fa-history"></i> Trip History</a>
+    <a href="{{ url_for('driver_earnings') }}"><i class="fas fa-coins"></i> Earnings & Collection</a>
+    <a href="{{ url_for('driver_add_vehicle') }}"><i class="fas fa-plus-circle"></i> Add Vehicle</a>
+    <a href="{{ url_for('driver_view_vehicles') }}"><i class="fas fa-list-alt"></i> View Vehicles</a>
+
+    <a href="{{ url_for('profile') }}"><i class="fas fa-user-circle"></i> View Profile</a>
+</nav>
+
+<!-- Main Content Area -->
+<div id="main-content" class="container-fluid">
+    <div class="welcome-card card p-4">
+        <h3 class="mb-0">Welcome back, {{ driver_user.name }}!</h3>
+        <p class="mb-0 mt-2 small">Here are the new trip requests waiting for assignment.</p>
+    </div>
+
+    <h2 class="text-warning mb-4"><i class="fas fa-bell"></i> New Trip Requests</h2>
+    
+    <div class="row">
+        {% if bookings %}
+            {% for item in bookings %}
+                <div class="col-lg-6 col-md-12">
+                    <div class="job-card card shadow">
+                        <div class="job-card-header">
+                            <span><i class="fas fa-road"></i> Trip #{{ item.booking.id }}</span>
+                            <span class="badge bg-warning text-dark">NEW</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <!-- Passenger Info -->
+                                <div class="col-6 border-end border-secondary">
+                                    <p class="info-label">PASSENGER</p>
+                                    <p class="location-text"><i class="fas fa-user-circle"></i> {{ item.passenger_name }}</p>
+                                    <p class="location-text text-muted"><i class="fas fa-mobile-alt"></i> {{ item.passenger_mobile }}</p>
+                                </div>
+                                <!-- Fare & Details -->
+                                <div class="col-6 text-end">
+                                    <p class="info-label">EST. FARE</p>
+                                    <h4 class="text-success"><i class="fas fa-rupee-sign"></i> {{ item.booking.total_fare | round(2) }}</h4>
+                                    <p class="text-muted small mb-0">{{ item.booking.distance | round(1) }} km | {{ item.booking.vehicle }}</p>
+                                </div>
+                            </div>
+
+                            <hr class="text-secondary">
+                            
+                            <!-- Pickup/Drop -->
+                            <div class="mb-3">
+                                <p class="info-label">PICKUP / DROPOFF</p>
+                                <p class="mb-1"><i class="fas fa-dot-circle text-primary"></i> {{ item.booking.pickup }}</p>
+                                <p><i class="fas fa-map-pin text-danger"></i> {{ item.booking.drop_off }}</p>
+                            </div>
+
+                            <!-- Action -->
+<a href="{{ url_for('driver_accept', booking_id=item.booking.id) }}" 
+   class="btn w-100 accept-btn">
+    <i class="fas fa-check-circle"></i> Accept Job
+</a>
+
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-success text-center" role="alert">
+                    <i class="fas fa-smile"></i> No new bookings currently available. Check back soon!
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        
+        sidebar.classList.toggle('open');
+        
+        // Toggle class on main content for potential margin adjustment on desktop
+        mainContent.classList.toggle('sidebar-open');
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+</body>
+</html>

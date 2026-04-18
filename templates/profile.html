@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Profile</title>
+    <style>
+        /* --- General & Container Styles (Remain the same) --- */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #ecf0f1;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            padding: 40px;
+            border-radius: 12px;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #ffffff;
+        }
+        
+        /* Form Styling */
+        form {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"], input[type="email"], input[type="tel"], textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            border: 1px solid #5a74a1;
+            box-sizing: border-box;
+            background-color: rgba(255, 255, 255, 0.8);
+            color: #34495e;
+            resize: vertical;
+        }
+        
+        /* --- Photo Container Styles --- */
+        .photo-container {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 20px auto;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        .profile-photo {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid #f39c12;
+            transition: all 0.3s ease;
+        }
+
+        .photo-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .photo-container:hover .profile-photo {
+            filter: brightness(0.7);
+        }
+
+        .photo-container:hover .photo-overlay {
+            opacity: 1;
+        }
+
+        .delete-btn {
+            background: none;
+            border: 1px solid white;
+            color: white;
+            padding: 5px 10px;
+            cursor: pointer;
+            margin-top: 5px;
+            border-radius: 4px;
+            font-size: 0.8em;
+        }
+
+        /* Hide the file input */
+        #photo-upload-input {
+            display: none;
+        }
+        
+        .update-btn {
+            background-color: #f39c12;
+            box-shadow: 0 4px 0 #e67e22;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .update-btn:hover {
+            background-color: #e67e22;
+        }
+        
+        /* ... (Your existing action-button styles remain) ... */
+        .logout-btn { background-color: #e74c3c; box-shadow: 0 4px 0 #c0392b; }
+        .logout-btn:hover { background-color: #c0392b; }
+        .password-btn { background-color: #9b59b6; box-shadow: 0 4px 0 #8e44ad; }
+        .password-btn:hover { background-color: #8e44ad; }
+        .back-btn { background-color: #34495e; box-shadow: 0 4px 0 #2c3e50; }
+        .back-btn:hover { background-color: #2c3e50; }
+        .flash { /* ... flash styles ... */ }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Hello, {{ user.name }}!</h1>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="photo-container" onclick="document.getElementById('photo-upload-input').click();">
+        <img src="{{ user.photo_path }}" alt="Profile Photo" class="profile-photo" id="profile-photo-display">
+        <div class="photo-overlay">
+            <span>Click to Change Photo</span>
+            
+            {% if user.photo_path != default_photo %}
+            <form method="POST" action="{{ url_for('delete_photo') }}" style="margin:0; padding:0;">
+                <button type="submit" class="delete-btn">Delete Photo</button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+    
+    <h2>Update Profile Details</h2>
+    
+    <form method="POST" action="{{ url_for('profile') }}" enctype="multipart/form-data">
+        
+        <input type="file" id="photo-upload-input" name="photo" accept="image/png, image/jpeg, image/gif" onchange="this.form.submit()"> 
+
+        <label for="username_display">Username:</label>
+        <input type="text" id="username_display" value="{{ username }}" disabled>
+        
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" value="{{ user.name }}" required>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" value="{{ user.email }}" required>
+        
+        <label for="mobile">Mobile Number:</label>
+        <input type="tel" id="mobile" name="mobile" value="{{ user.mobile }}" required>
+
+        <label for="address">Address:</label>
+        <textarea id="address" name="address" rows="3">{{ user.address }}</textarea>
+        
+        <button type="submit" class="update-btn">Update Profile Details</button>
+    </form>
+
+    <h2>Account Actions</h2>
+    <div class="action-buttons">
+        <a href="{{ url_for('logout') }}"><button class="logout-btn">Logout</button></a>
+        <a href="{{ url_for('change_password') }}"><button class="password-btn">Change Password</button></a>
+        <!-- This section decides the redirection target -->
+    {% if user.role == 'driver' %}
+        <a href="{{ url_for('driver_dashboard') }}"><button class="back-btn">← Back to Dashboard</button></a>
+    {% else %}
+        <!-- Default case for 'passenger' or 'admin' (if admin dashboard is not ready) -->
+        <a href="{{ url_for('home') }}"><button class="back-btn">← Back to Home</button></a>
+    {% endif %}
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,42 @@
+
+<style>
+body {
+    background-image: url("{{ url_for('static', filename='background.jpg') }}");
+    background-size: cover;
+    color: white;
+    font-family: Arial, sans-serif;
+    padding: 20px;
+}
+.container { background: rgba(0,0,0,0.5); padding: 20px; border-radius: 8px; max-width:800px; margin:auto;}
+button { padding:10px 18px; margin:5px; cursor:pointer; border-radius:6px; }
+input, select { padding:8px; margin:5px 0; width:100%; box-sizing:border-box; border-radius:4px; }
+label { display:block; margin-top:8px; }
+</style>
+
+<!DOCTYPE html>
+<html><head><title>Payment</title></head>
+<body>
+<div class="container">
+    <h2>Payment for Booking ID: {{ booking.id }}</h2>
+    <p>Vehicle: {{ booking.vehicle }} | Total Fare: ₹{{ booking.total_fare }}</p>
+    <form method="POST">
+        <label><input type="radio" name="payment_method" value="card" checked> Credit/Debit Card</label>
+        <label><input type="radio" name="payment_method" value="cod"> Cash on Delivery</label>
+        <div id="card_fields">
+            <label>Card Number</label><input type="text" name="card_number" placeholder="xxxx-xxxx-xxxx-1234">
+            <label>Name on Card</label><input type="text" name="card_name">
+            <label>Expiry</label><input type="text" name="expiry" placeholder="MM/YY">
+            <label>CVV</label><input type="password" name="cvv">
+        </div>
+        <button type="submit">Proceed</button>
+    </form>
+    <a href="/">Back to Home</a>
+</div>
+<script>
+const cardFields = document.getElementById("card_fields");
+const radios = document.getElementsByName("payment_method");
+radios.forEach(r => r.addEventListener("change", function(){
+    cardFields.style.display = (this.value === "cod") ? "none" : "block";
+}));
+</script>
+</body></html>
